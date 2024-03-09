@@ -57,7 +57,7 @@ export const ItensStyles = {
       fontSize: '28px',
       padding: '0 25px',
       fontFamily: 'Red Hat Display, sans-serif',
-      fontWeight: 'medium',
+      fontWeight: 'bold',
   },    
   extra: {
     color: '#000',

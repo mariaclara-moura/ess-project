@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { use, useState } from "react";
 import { ItensStyles } from "./styles";
 import {
   Pencil,
@@ -7,29 +7,18 @@ import {
 } from "./assets";
 
 import { ApiItens } from "@/services/itens";
+import { useForm, SubmitHandler, Form } from 'react-hook-form';
 
 
-const Modal = () => {
-
-    const [nomeValue, setNomeValue] = useState("");
-    const [priceValue, setPriceValue] = useState(0); // Replace 'number' with a valid initial value
-    const [categoryValue, setCategoryValue] = useState("Blusas");
-    const [descriptionValue, setDescriptionValue] = useState("");
-    const [imageValue, setImageValue] = useState("");
-    const [colorsValue, setColorsValue] = useState("");
-    const [sizesValue, setSizesValue] = useState("");
-    const [amountValue, setAmountValue] = useState(0);
-
+const Modal = ({ item }: { item: any }) => {
+  // Aqui você pode usar os dados do item para exibir as informações desejadas
+  console.log(item); 
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [confirmDelete, setDeletepen] = useState(false);
-  
+
     const toggleConfirm = () => {
       setConfirmOpen(!confirmOpen); // Altera o estado confirmOpen para o oposto do valor atual
       setDeletepen(false); // Fecha o popup de confirmação
-    };
-  
-    const handleAddButtonClick = () => {
-      toggleConfirm(); // Chama a função toggleConfirm quando o botão Add é clicado
     };
   
     const toggle2Confirm = () => {
@@ -40,44 +29,38 @@ const Modal = () => {
     const handleDeleteButtonClick = () => {
       toggle2Confirm(); // Chama a função toggleConfirm quando o botão Add é clicado
     };
-  
-    const handleConfirmYes = async () => {
-      toggleConfirm(); // Fecha o popup de confirmação
-      // Prepara os dados para enviar para o backend
-      const data = {
-          name: nomeValue,
-          price: priceValue,
-          category: categoryValue,
-          description: descriptionValue,
-          image: imageValue,
-          colors: colorsValue,
-          sizes: sizesValue,
-          amount: amountValue,
-      };
+    type FormData = {
+      id: number;
+      name: string;
+      price: number;
+      category: string;
+      description: string;
+      image: string;
+      colors: string;
+      sizes: string;
+      amount: number;
+    }
+    const { register, handleSubmit } = useForm<FormData>();
+    const handleConfirm2: SubmitHandler<FormData> = async (data) => {
+      console.log(data);
+      toggleConfirm(); 
       try {
         // Chama a função createExample de ApiDeliveryPerson para enviar os dados para o backend
         await ApiItens.createExample(data);
         console.log("Informações enviadas com sucesso!");
         alert("Item cadastrado com sucesso!");
-        setNomeValue("");
-        setPriceValue(0);
-        setCategoryValue("");
-        setDescriptionValue("");
-        setImageValue("");
-        setColorsValue("");
-        setSizesValue("");
-        setAmountValue(0);
       } catch (error) {
         console.error("Erro ao enviar informações para o backend:", error);
       }
     };
-  
+
   return (
     <div
     id="descricao"
     style={{ display: "flex", justifyContent: "center" }}
   >
     <div style={ItensStyles.inputContainer}>
+      <form onSubmit={handleSubmit(handleConfirm2)}>
       <div
         style={{
           display: "flex",
@@ -95,17 +78,14 @@ const Modal = () => {
           }}
         >
           <h3 style={ItensStyles.infosStyle}>Nome da peça:</h3>
-          <input
-            type="text"
-            value={nomeValue}
-            onChange={(e) => setNomeValue(e.target.value)}
-            placeholder="escreva aqui"
+          <input {...register("name")}
+            placeholder={item.name}
             style={{
               ...ItensStyles.inputBox,
               height: "65%",
               marginLeft: "2%",
             }}
-          ></input>{" "}
+          ></input>
         </div>
         <img
           src={Pencil.src}
@@ -114,69 +94,47 @@ const Modal = () => {
       </div>
       <div style={ItensStyles.inputItens}>
         <p style={ItensStyles.extra}>Preço:</p>
-        <input
-        type="text"
-        placeholder="escreva um número"
-        value={priceValue === 0 ? "" : priceValue.toFixed(2).replace('.', ',')} 
-        onChange={(e) => {
-          const inputValue = e.target.value.replace(',', '.');
-          setPriceValue(parseFloat(inputValue) || 0);
-        }}
+        <input {...register("price")}
+        placeholder={item.price}
         style={ItensStyles.inputBox}
       ></input>
       </div>
       <div style={ItensStyles.inputItens}>
         <p style={ItensStyles.extra}>Quantidade:</p>
-        <input
-          type="number"
-          placeholder="escreva um número"
-          value={amountValue}
-          onChange={(e) => setAmountValue(Number(e.target.value))}
+        <input {...register("amount")}
+          placeholder={item.amount}
           style={ItensStyles.inputBox}
         ></input>
       </div>
       <div style={ItensStyles.inputItens}>
         <p style={ItensStyles.extra}>Tamanhos:</p>
-        <input
-          type="text"
-          placeholder="escreva aqui"
-          value={sizesValue}
-          onChange={(e) => setSizesValue(e.target.value)}
+        <input {...register("sizes")}
+          placeholder={item.sizes}
           style={ItensStyles.inputBox}
         ></input>
       </div>
       <div style={ItensStyles.inputItens}>
         <p style={ItensStyles.extra}>Foto:</p>
-        <input
-          type="text"
-          placeholder="escreva aqui"
-          value={imageValue}
-          onChange={(e) => setImageValue(e.target.value)}
+        <input {...register("image")}
+          placeholder={item.image}
           style={ItensStyles.inputBox}
         ></input>
       </div>
       <div style={ItensStyles.inputItens}>
         <p style={ItensStyles.extra}>Cores:</p>
-        <input
-          type="text"
-          placeholder="escreva aqui"
-          value={colorsValue}
-          onChange={(e) => setColorsValue(e.target.value)}
+        <input {...register("colors")}
+          placeholder={item.colors}
           style={ItensStyles.inputBox}
         ></input>
-        
       </div>
       <div style={ItensStyles.inputItens}>
         <p style={ItensStyles.extra}>Descrição:</p>
-        <input
-          type="text"
-          placeholder="escreva aqui"
-          value={descriptionValue}
-          onChange={(e) => setDescriptionValue(e.target.value)}
+        <input {...register("description")}
+          placeholder={item.description}
           style={{
             ...ItensStyles.inputBox,
             width: "70%",
-            height: "200%",
+            height: '80px',
           }}
         ></input>
       </div>
@@ -188,17 +146,38 @@ const Modal = () => {
           padding: "3%",
         }}
       >
+        <button type="submit">
         <img
           src={Check.src}
           style={{ width: "102px", height: "43px", cursor: "pointer" }}
-          onClick={handleAddButtonClick}
-        />
+        /></button>
         <img
           src={Trash.src}
           style={{ width: "102px", height: "43px", cursor: "pointer" }}
           onClick={handleDeleteButtonClick}
-        />{" "}
-      </div>
+        />
+      </div></form>
+      {confirmDelete && (
+          <div style={ItensStyles.confirmPopup}>
+            <div style={ItensStyles.confirmPopupInner}>
+              <p>Tem certeza que quer remover?</p>
+              <div>
+                <button
+                  onClick={handleDeleteButtonClick}
+                  style={ItensStyles.confirmButton}
+                >
+                  Sim
+                </button>
+                <button
+                  onClick={toggle2Confirm}
+                  style={ItensStyles.confirmButton}
+                >
+                  Não
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
     </div>
   </div>      
   );
@@ -206,84 +185,52 @@ const Modal = () => {
 
 
 const Modal2 = () => {
-  
-    const [nomeValue, setNomeValue] = useState("");
-    const [priceValue, setPriceValue] = useState(0); // Replace 'number' with a valid initial value
-    const [categoryValue, setCategoryValue] = useState("Blusas");
-    const [descriptionValue, setDescriptionValue] = useState("");
-    const [imageValue, setImageValue] = useState("");
-    const [colorsValue, setColorsValue] = useState("");
-    const [sizesValue, setSizesValue] = useState("");
-    const [amountValue, setAmountValue] = useState(0);
-    const [itemCreated, setitemCreated] = useState(false);
-  
-    const [selectedItem, setSelectedItem] = useState(null);
-    const [createdItem, setCreateItem] = useState(null);
-    const [confirmOpen, setConfirmOpen] = useState(false);
-    const [confirmDelete, setDeletepen] = useState(false);
-  
-  
-    const handleAddClick = (itemIndex: any) => {
-      setCreateItem((prevCreateItem) =>
-        prevCreateItem === itemIndex ? null : itemIndex
-      );
-      setSelectedItem(null); // Disable selectedItem when add is clicked
-    };
-  
-    const toggleConfirm = () => {
-      setConfirmOpen(!confirmOpen); // Altera o estado confirmOpen para o oposto do valor atual
-      setDeletepen(false); // Fecha o popup de confirmação
-    };
-  
-    const handleAddButtonClick = () => {
-      toggleConfirm(); // Chama a função toggleConfirm quando o botão Add é clicado
-    };
-  
-    const toggle2Confirm = () => {
-      setDeletepen(!confirmDelete); // Altera o estado confirmOpen para o oposto do valor atual
-      setConfirmOpen(false); // Fecha o popup de confirmação
-    };
-  
-    const handleDeleteButtonClick = () => {
-      toggle2Confirm(); // Chama a função toggleConfirm quando o botão Add é clicado
-    };
-  
-    const handleConfirmYes = async () => {
-      toggleConfirm(); // Fecha o popup de confirmação
-      // Prepara os dados para enviar para o backend
-      const data = {
-          name: nomeValue,
-          price: priceValue,
-          category: categoryValue,
-          description: descriptionValue,
-          image: imageValue,
-          colors: colorsValue,
-          sizes: sizesValue,
-          amount: amountValue,
-      };
+
+    type FormData2 = {
+        name: string;
+        price: number;
+        category: string;
+        description: string;
+        image: string;
+        colors: string;
+        sizes: string;
+        amount: number;
+      }
+    const { register, handleSubmit, formState:{errors} } = useForm<FormData2>();
+
+    const handleConfirmYes: SubmitHandler<FormData2> = async (data) => {
+      console.log(data);
+      const priceAsFloat = parseFloat(String(data.price));
+
+      if (isNaN(priceAsFloat)) {
+        console.error("Invalid price value:", data.price);
+        return;
+      }
+      const amountAsFloat = parseFloat(String(data.amount));
+      if (isNaN(amountAsFloat)) {
+        console.error("Invalid amount value:", data.amount);
+        return;
+      }
+      const newData = { ...data, price: priceAsFloat, amount: amountAsFloat};
+    
       try {
-        // Chama a função createExample de ApiDeliveryPerson para enviar os dados para o backend
-        await ApiItens.createExample(data);
+        // Call the createExample function of ApiItens to send the data to the backend
+        await ApiItens.createExample(newData);
         console.log("Informações enviadas com sucesso!");
         alert("Item cadastrado com sucesso!");
-        setitemCreated(true); 
-        setNomeValue("");
-        setPriceValue(0);
-        setCategoryValue("");
-        setDescriptionValue("");
-        setImageValue("");
-        setColorsValue("");
-        setSizesValue("");
-        setAmountValue(0);
+        window.location.reload();
+
       } catch (error) {
         console.error("Erro ao enviar informações para o backend:", error);
       }
     };
+    
   
     return (
         <>
         <div id="criar" style={{ display: "flex", justifyContent: "center" }}>
         <div style={ItensStyles.inputContainer}>
+        <form onSubmit={handleSubmit(handleConfirmYes)}>
           <div
             style={{
               display: "flex",
@@ -300,88 +247,75 @@ const Modal2 = () => {
                 width: "100%",
               }}
             >
-              <h3 style={ItensStyles.infosStyle}>Nome da peça:</h3>
-              <input
-                value={nomeValue}
-                onChange={(e) => setNomeValue(e.target.value)}
-                type="text"
+              <p style={ItensStyles.extra}>Nome da peça:</p>
+              <input {...register("name", {required: true})}
                 placeholder="escreva aqui"
                 style={{
                   ...ItensStyles.inputBox,
-                  height: "65%",
-                  marginLeft: "2%",
                 }}
-              ></input>{" "}
+              ></input>
+              {errors.name && <p style={{color: 'red'}}>Campo obrigatório</p>}
             </div>
           </div>
           <div style={ItensStyles.inputItens}>
-            <p style={ItensStyles.extra}>Preço:</p>
-            <input
-            type="text"
-            placeholder="escreva um número"
-            value={priceValue === 0 ? "" : priceValue.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-            onChange={(e) => {
-              const inputValue = e.target.value;
-              const numericValue = inputValue !== "" ? parseFloat(inputValue.replace(',', '.')) : 0;
-              setPriceValue(numericValue);
-            }}
+            <p style={ItensStyles.extra}>Categoria:</p>
+            <input {...register("category", {required: true})}
+            placeholder="escreva aqui"
             style={ItensStyles.inputBox}
-          />
-
+          ></input>
+          {errors.category && <p style={{color: 'red'}}>Campo obrigatório</p>}
+          </div> <div style={ItensStyles.inputItens}>
+            <p style={ItensStyles.extra}>Preço:</p>
+            <input {...register("price", {required: true})}
+            placeholder="escreva um número"
+            style={ItensStyles.inputBox}
+          ></input>
+          {errors.price && <p style={{color: 'red'}}>Campo obrigatório</p>}
           </div>
           <div style={ItensStyles.inputItens}>
             <p style={ItensStyles.extra}>Quantidade:</p>
-            <input
-              type="number"
-              placeholder="escreva um número"
-              value={amountValue}
-              onChange={(e) => setAmountValue(Number(e.target.value))}
-              style={ItensStyles.inputBox}
-            ></input>
+            <input {...register("amount", {required: true})}
+          placeholder="escreva um número"
+          style={ItensStyles.inputBox}
+        ></input>
+         {errors.amount && <p style={{color: 'red'}}>Campo obrigatório</p>}
           </div>
           <div style={ItensStyles.inputItens}>
             <p style={ItensStyles.extra}>Tamanhos:</p>
-            <input
-              type="text"
-              placeholder="escreva aqui"
-              value={sizesValue}
-              onChange={(e) => setSizesValue(e.target.value)}
-              style={ItensStyles.inputBox}
-            ></input>
+            <input {...register("sizes", {required: true})}
+          placeholder="escreva aqui"
+          style={ItensStyles.inputBox}
+        ></input>
+          {errors.sizes && <p style={{color: 'red'}}>Campo obrigatório</p>}
           </div>            
             <div style={ItensStyles.inputItens}>
             <p style={ItensStyles.extra}>Foto:</p>
-            <input
-              type="text"
-              placeholder="escreva aqui"
-              value={imageValue}
-              onChange={(e) => setImageValue(e.target.value)}
-              style={ItensStyles.inputBox}
-            ></input>
+            <input {...register("image", {required: true})}
+          placeholder="escreva aqui"
+          style={ItensStyles.inputBox}
+        ></input>
+        {errors.image && <p style={{color: 'red'}}>Campo obrigatório</p>}
           </div>
           <div style={ItensStyles.inputItens}>
             <p style={ItensStyles.extra}>Cores:</p>
-            <input
-              type="text"
-              placeholder="escreva aqui"
-              value={colorsValue}
-              onChange={(e) => setColorsValue(e.target.value)}
-              style={ItensStyles.inputBox}
-            ></input>
+            <input {...register("colors", {required: true})}
+          placeholder="escreva aqui"
+          style={ItensStyles.inputBox}
+        ></input>
+        {errors.colors && <p style={{color: 'red'}}>Campo obrigatório</p>}
           </div>
           <div style={ItensStyles.inputItens}>
             <p style={ItensStyles.extra}>Descrição:</p>
-            <input
-              type="text"
-              placeholder="escreva aqui"
-              value={descriptionValue}
-              onChange={(e) => setDescriptionValue(e.target.value)}
-              style={{
-                ...ItensStyles.inputBox,
-                width: "70%",
-                height: "200%",
-              }}
-            ></input>
+            <textarea {...register("description", {required: true})}
+          placeholder="escreva aqui"
+          style={{
+            ...ItensStyles.inputBox,
+            width: "70%",
+            height: '80px',
+            wordWrap: 'break-word', // or 'break-all'
+          }}
+        ></textarea>
+        {errors.description && <p style={{color: 'red'}}>Campo obrigatório</p>}
           </div>
           <div
             style={{
@@ -391,61 +325,16 @@ const Modal2 = () => {
               padding: "3%",
             }}
           >
+            <button type="submit">
             <img
               src={Check.src}
               style={{ width: "102px", height: "43px", cursor: "pointer" }}
-              onClick={handleAddButtonClick}
-            />
-            <img
-              src={Trash.src}
-              style={{ width: "102px", height: "43px", cursor: "pointer" }}
-              onClick={handleDeleteButtonClick}
-            />{" "}
-          </div>
+            /></button>
+            
+          </div> </form>
         </div>
       </div>
-      {confirmOpen && (
-          <div style={ItensStyles.confirmPopup}>
-            <div style={ItensStyles.confirmPopupInner}>
-              <p>Tem certeza que quer adicionar?</p>
-              <div>
-                <button
-                  onClick={handleConfirmYes}
-                  style={ItensStyles.confirmButton}
-                >
-                  Sim
-                </button>
-                <button
-                  onClick={toggleConfirm}
-                  style={ItensStyles.confirmButton}
-                >
-                  Não
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-        {confirmDelete && (
-          <div style={ItensStyles.confirmPopup}>
-            <div style={ItensStyles.confirmPopupInner}>
-              <p>Tem certeza que quer remover?</p>
-              <div>
-                <button
-                  onClick={handleAddClick}
-                  style={ItensStyles.confirmButton}
-                >
-                  Sim
-                </button>
-                <button
-                  onClick={toggle2Confirm}
-                  style={ItensStyles.confirmButton}
-                >
-                  Não
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+
       </>
     );
     }

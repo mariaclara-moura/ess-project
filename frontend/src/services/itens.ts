@@ -23,22 +23,22 @@ export namespace ApiItens {
   }
 
   interface UpdateData {
-        name: string,
-        price: number,
-        category: string,
-        description: string,
-        image: string,
-        colors: string,
-        sizes: string,
-        amount: number,      
+        name?: string,
+        price?: number,
+        category?: string,
+        description?: string,
+        image?: string,
+        colors?: string,
+        sizes?: string,
+        amount?: number,      
   }
 
-    export async function updateUser(id: string, userData: UpdateData) {
+    export async function updateUser(id: number, userData: UpdateData) {
       const response = await backend.patch(`/itens/${id}`, userData); //RESOLVER
       return response.data.data;
     }
  
-    export async function deleteExample(id: string) {
+    export async function deleteExample(id: number) {
         const response = await backend.delete(`/itens/${id}`);
         return response.data.data;
         }

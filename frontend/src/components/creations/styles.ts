@@ -31,7 +31,7 @@ export const ItensStyles = {
     inputContainer: {
       backgroundColor: '#FFFFFF',
       width: '830px',
-      height: '600px',
+      height: '650px',
       borderRadius: '8px',
       boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.6)',
       display: 'flex',
