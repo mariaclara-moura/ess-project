@@ -11,8 +11,12 @@ import { useForm, SubmitHandler, Form } from 'react-hook-form';
 
 
 const Modal = ({ item }: { item: any }) => {
-  // Aqui você pode usar os dados do item para exibir as informações desejadas
-  console.log(item); 
+    const [isEditing, setIsEditing] = useState(false);
+
+    const toggleEditing = () => {
+      setIsEditing(!isEditing);
+    }; 
+    console.log(item); 
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [confirmDelete, setDeletepen] = useState(false);
 
@@ -31,27 +35,54 @@ const Modal = ({ item }: { item: any }) => {
     };
     type FormData = {
       id: number;
-      name: string;
-      price: number;
-      category: string;
-      description: string;
-      image: string;
-      colors: string;
-      sizes: string;
-      amount: number;
+      name?: string;
+      price?: number;
+      category?: string;
+      description?: string;
+      image?: string;
+      colors?: string;
+      sizes?: string;
+      amount?: number;
     }
-    const { register, handleSubmit } = useForm<FormData>();
-    const handleConfirm2: SubmitHandler<FormData> = async (data) => {
-      console.log(data);
+    const { register, handleSubmit, setValue } = useForm<FormData>({
+      defaultValues: {
+         id: item.id, // Inicializa o campo 'id' com o ID do item
+      },
+     });
+     const handleConfirm2: SubmitHandler<FormData> = async (data) => {
+      // Atualiza o valor do campo 'id' com o ID atual do item
+      setValue('id', item.id);
+
+      console.log("entrou",data);
+
+      const priceAsFloat = data.price ? parseFloat(String(data.price)) : undefined;
+      const amountAsFloat = data.amount ? parseFloat(String(data.amount)) : undefined;
+      
+      
+      const newData = { ...data, price: priceAsFloat, amount: amountAsFloat};
+      console.log("alterado",newData);
+     
       toggleConfirm(); 
       try {
         // Chama a função createExample de ApiDeliveryPerson para enviar os dados para o backend
-        await ApiItens.createExample(data);
-        console.log("Informações enviadas com sucesso!");
-        alert("Item cadastrado com sucesso!");
+        await ApiItens.updateUser(data.id,newData);
+        console.log("Informações alteradas com sucesso!");
+        alert("Item alterado com sucesso!");
       } catch (error) {
         console.error("Erro ao enviar informações para o backend:", error);
       }
+      window.location.reload();
+    };
+
+    const handleDelete = async (id:number) => {
+      try {
+        await ApiItens.deleteExample(id);
+        console.log("Item excluído");
+        alert("Item excluído com sucesso!");
+      } catch (error) {
+        console.error("Erro ao enviar informações para o backend:", error);
+      }
+      window.location.reload();
     };
 
   return (
@@ -85,11 +116,13 @@ const Modal = ({ item }: { item: any }) => {
               height: "65%",
               marginLeft: "2%",
             }}
+            disabled={!isEditing}
           ></input>
         </div>
         <img
           src={Pencil.src}
           style={{ width: "30px", height: "30px", cursor: "pointer" }}
+          onClick={toggleEditing}
         />
       </div>
       <div style={ItensStyles.inputItens}>
@@ -97,6 +130,7 @@ const Modal = ({ item }: { item: any }) => {
         <input {...register("price")}
         placeholder={item.price}
         style={ItensStyles.inputBox}
+        disabled={!isEditing}
       ></input>
       </div>
       <div style={ItensStyles.inputItens}>
@@ -104,6 +138,7 @@ const Modal = ({ item }: { item: any }) => {
         <input {...register("amount")}
           placeholder={item.amount}
           style={ItensStyles.inputBox}
+          disabled={!isEditing}
         ></input>
       </div>
       <div style={ItensStyles.inputItens}>
@@ -111,6 +146,7 @@ const Modal = ({ item }: { item: any }) => {
         <input {...register("sizes")}
           placeholder={item.sizes}
           style={ItensStyles.inputBox}
+          disabled={!isEditing}
         ></input>
       </div>
       <div style={ItensStyles.inputItens}>
@@ -118,6 +154,7 @@ const Modal = ({ item }: { item: any }) => {
         <input {...register("image")}
           placeholder={item.image}
           style={ItensStyles.inputBox}
+          disabled={!isEditing}
         ></input>
       </div>
       <div style={ItensStyles.inputItens}>
@@ -125,6 +162,7 @@ const Modal = ({ item }: { item: any }) => {
         <input {...register("colors")}
           placeholder={item.colors}
           style={ItensStyles.inputBox}
+          disabled={!isEditing}
         ></input>
       </div>
       <div style={ItensStyles.inputItens}>
@@ -136,6 +174,7 @@ const Modal = ({ item }: { item: any }) => {
             width: "70%",
             height: '80px',
           }}
+          disabled={!isEditing}
         ></input>
       </div>
       <div
@@ -163,7 +202,7 @@ const Modal = ({ item }: { item: any }) => {
               <p>Tem certeza que quer remover?</p>
               <div>
                 <button
-                  onClick={handleDeleteButtonClick}
+                  onClick={() => handleDelete(item.id)}
                   style={ItensStyles.confirmButton}
                 >
                   Sim
