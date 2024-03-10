@@ -6,8 +6,6 @@ import {
   Previous,
   Next,
   Add,
-  Look,
-  Fix,
 } from "./assets";
 import { ApiItens } from "@/services/itens";
 import { Modal, Modal2 } from '@/components/creations/modals'
@@ -17,6 +15,7 @@ export default function Itens() {
   const [categories, setCategories] = useState<string[]>([]); // State to store unique categories
 
   interface createItem {
+    id: number,
     name: string,
     price: number,
     category: string,
@@ -26,8 +25,8 @@ export default function Itens() {
     sizes: string,
     amount: number,
 }
-  const [selectedItem, setSelectedItem] = useState(null);
-  const [createdItem, setCreateItem] = useState(null);
+const [selectedItem, setSelectedItem] = useState<{ id: number, category: string } | null>(null);
+const [createdItem, setCreateItem] = useState(null);
 
   const handlePreviousClick = () => {
     setCurrentIndex((prevIndex) => Math.max(prevIndex - 1, 0));
@@ -66,13 +65,12 @@ export default function Itens() {
     }
   };
 
-  const handleItemClick = (itemIndex: any) => {
+  const handleItemClick = (itemId: number, category: string) => {
     setSelectedItem((prevSelectedItem) =>
-       prevSelectedItem === itemIndex ? null : itemIndex
+      prevSelectedItem && prevSelectedItem.id === itemId && prevSelectedItem.category === category ? null : { id: itemId, category }
     );
     setCreateItem(null); // Disable createdItem when an item is clicked
-   };
-   
+ };
 
   const handleAddClick = (itemIndex: any) => {
     setCreateItem((prevCreateItem) =>
@@ -120,7 +118,7 @@ export default function Itens() {
               .map((item, index) => (
                 <div
                   key={index}
-                  onClick={() => handleItemClick(currentIndex + index)}
+                  onClick={() => handleItemClick(item.id, item.category)} // Modifique para passar o id e a categoria do item
                   style={{
                     display: "flex",
                     justifyContent: "center",
@@ -148,11 +146,9 @@ export default function Itens() {
             />
           </div>
         </div>
-        {selectedItem !== null && (
-        <Modal item={items[selectedItem]} />
-        )}
-
-
+        {selectedItem && selectedItem.category === category && (
+            <Modal item={items.find(item => item.id === selectedItem.id)} />
+          )}
       </div>))}
     </div>
   );
