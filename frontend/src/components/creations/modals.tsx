@@ -123,6 +123,7 @@ const Modal = ({ item }: { item: any }) => {
           src={Pencil.src}
           style={{ width: "30px", height: "30px", cursor: "pointer" }}
           onClick={toggleEditing}
+          alt="Editar"
         />
       </div>
       <div style={ItensStyles.inputItens}>

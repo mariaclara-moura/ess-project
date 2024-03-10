@@ -129,7 +129,7 @@ const [createdItem, setCreateItem] = useState(null);
                 >
                   <img
                     src={item.image}
-                    alt={`Look ${currentIndex + index + 1}`}
+                    alt={`Look ${item.name}`}
                     style={{ width: "170px", height: "200px" }}
                   />
                   <h2 style={ItensStyles.itensName}>{item.name}</h2>
